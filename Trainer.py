@@ -15,7 +15,7 @@ from models.PointerGeneratorTransformer import PointerGeneratorTransformer
 from utils import *
 
 class Trainer(object):
-    def __init__(self, args, rank=1):
+    def __init__(self, args, rank=0):
         super(Trainer, self).__init__()
         self.dataset_dir = args.dataset_dir
         self.max_len = args.max_len
@@ -35,8 +35,8 @@ class Trainer(object):
         self.test_data = self.load_data(args.test_file, 'test.pt', is_test=True)
 
         self.model = PointerGeneratorTransformer(
-                        src_vocab_size=self.vocab_size, tgt_vocab_size=self.vocab_size,
-                        max_len=self.max_len  
+                        rank=self.rank, src_vocab_size=self.vocab_size, 
+                        tgt_vocab_size=self.vocab_size, max_len=self.max_len  
                     )
         
         self.logger = get_logger()
@@ -149,7 +149,7 @@ class Trainer(object):
                 tgt_input_ids, tgt_token_type_ids, tgt_input_masks = batch[3].to(self.rank), batch[4].to(self.rank), batch[5].to(self.rank)
                 
                 outputs = model(src_input_ids, src_token_type_ids, src_input_masks, tgt_input_ids, tgt_token_type_ids, tgt_input_masks)
-                
+
                 loss = self.get_loss(outputs.transpose(0, 1), tgt_input_ids.transpose(0, 1))
 
                 loss.backward()
@@ -222,7 +222,8 @@ class Trainer(object):
         with torch.no_grad():
             for batch in tqdm(test_loader):
                 src_input_ids, src_token_type_ids, src_input_masks = batch[0].to(self.rank), batch[1].to(self.rank), batch[2].to(self.rank)
-                
+                string = self.decode(src_input_ids)
+                print(string)
                 memory = model.encode(src_input_ids, src_token_type_ids, src_input_masks).transpose(0, 1)
                 tgt_input_ids = torch.zeros(src_input_ids.shape[0], self.max_len, dtype=torch.long, device=self.rank)
                 tgt_input_ids[:, 0] = self.vocab['[CLS]']   # bert sentence head
@@ -238,6 +239,7 @@ class Trainer(object):
                     
                     # print(tgt_input_ids[:, j])
                     # break
+                # print(tgt_input_ids)
                 string = self.decode(tgt_input_ids)
                 print(string)
                 break

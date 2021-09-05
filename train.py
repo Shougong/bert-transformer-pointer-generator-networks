@@ -17,7 +17,7 @@ def main():
                         help='vocab path for pre-trained model')
     parser.add_argument('--max_len', type=int, default=200, 
                         help='vocab path for pre-trained model')
-    parser.add_argument('--train_batch_size', type=int, default=16, 
+    parser.add_argument('--train_batch_size', type=int, default=32, 
                         help='batch size for training')
     parser.add_argument('--eval_batch_size', type=int, default=64, 
                         help='batch size for evaluating')
