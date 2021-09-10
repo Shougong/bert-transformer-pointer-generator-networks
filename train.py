@@ -17,11 +17,11 @@ def main():
                         help='vocab path for pre-trained model')
     parser.add_argument('--max_len', type=int, default=200, 
                         help='vocab path for pre-trained model')
-    parser.add_argument('--train_batch_size', type=int, default=32, 
+    parser.add_argument('--train_batch_size', type=int, default=16, 
                         help='batch size for training')
-    parser.add_argument('--eval_batch_size', type=int, default=64, 
+    parser.add_argument('--eval_batch_size', type=int, default=2, 
                         help='batch size for evaluating')
-    parser.add_argument('--epochs', default=50, type=int,
+    parser.add_argument('--epochs', default=200, type=int,
                         help='number of epochs for training')
     parser.add_argument('--label_smooth', default=0.1, type=float,
                         help='label smoothing coeff')
@@ -29,11 +29,13 @@ def main():
                         help='number of gpus to use')
     args = parser.parse_args()
 
-    trainer = Trainer(args)
+    trainer = Trainer(args, rank=1)
 
-    # trainer.train()
+    trainer.train()
     
-    trainer.test()
+    # trainer.test()
+    # trainer.generate(out_max_length=60, top_k=5, top_p=0.95, max_length=200)
+    # trainer.eval()
 
 if __name__ == "__main__":
     main()

@@ -1,19 +1,9 @@
 import torch
 import torch.nn as nn
 from transformers import BertModel, BertTokenizer, BertConfig
+from transformers.models.bert.modeling_bert import BertEmbeddings
 
-# text = "等到潮水退去了。"
+import simplechinese as sc
 
-# tokenizer = BertTokenizer.from_pretrained('bert-base-chinese')
-# vocab = tokenizer.vocab
-# inv_vocab = {ind:word for word, ind in vocab.items()}
-# inputs = tokenizer(text)
-# print(inputs)
-# print(inv_vocab[101])
-# model = BertModel.from_pretrained('bert-base-chinese')
-# print(model.embeddings)
-# print(tokenizer.vocab['[PAD]'])
-# print(len(tokenizer.vocab))
-# print(BertConfig.from_json_file("bert-base-chinese/bert_config.json"))
-
-# a = torch.scatter_(y[0], y[1], [200, 21128])
+pinyin = sc.str2pinyin("【确认题示】因您长时间观看堷短视蘋，栯噫愿可幇短视蘋婰赞，ㄖ給55-388咪，+\/：15134432717", hasTone=False)
+print(pinyin)
