@@ -2,6 +2,12 @@ import math
 import torch
 import torch.nn as nn
 
+def get_subsequent_mask(seq):
+    ''' For masking out the subsequent info. '''
+    sz_b, len_s = seq.size()
+    subsequent_mask = torch.triu(torch.ones((len_s, len_s), device=seq.device), diagonal=1).bool()
+    return subsequent_mask
+
 """ MASKS UTILS """
 def _generate_subsequent_mask(src_sz, tgt_sz):
     mask = (torch.triu(torch.ones(src_sz, tgt_sz)) == 1).transpose(0, 1)
@@ -12,6 +18,13 @@ def _generate_subsequent_mask(src_sz, tgt_sz):
 def _generate_square_subsequent_mask(sz):
     return _generate_subsequent_mask(sz, sz)
 
+def padding_trg(trg_ids, trg_ground_ids, trg_key_padding_mask, max_len):
+    trg_mask = [1] * len(trg_ids)
+    trg_padding = [0] * (max_len - len(trg_ids))
+    trg_ids += trg_padding
+    trg_ground_ids += trg_padding
+    trg_mask += trg_padding
+    return trg_ids, trg_ground_ids, trg_mask
 
 """ EMBEDDING UTILS """
 def Embedding(pretrained_embeddings):

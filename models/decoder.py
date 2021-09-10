@@ -2,19 +2,17 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn.modules import TransformerDecoderLayer
-from torch.nn.modules.activation import MultiheadAttention
+# from torch.nn.modules import TransformerDecoderLayer
+# from torch.nn.modules.activation import MultiheadAttention
 from torch.nn import Linear, Dropout
 from torch.nn import LayerNorm
-from torch.nn.modules.transformer import _get_activation_fn, _get_clones
-
 
 class TransformerDecoder(nn.Module):
-    def __init__(self, num_layers, d_model=768, dim_feedforward=3072, nhead=8, dropout=0.1):
+    def __init__(self, num_layers, d_model=768, dim_feedforward=3072, nhead=12, dropout=0.1):
         super(TransformerDecoder, self).__init__()
         self.num_layers = num_layers
-        self.self_attn = MultiheadAttention(d_model, nhead, dropout=dropout)
-        self.multihead_attn = MultiheadAttention(d_model, nhead, dropout=dropout)
+        self.self_attn = nn.MultiheadAttention(d_model, nhead, dropout=dropout)
+        self.multihead_attn = nn.MultiheadAttention(d_model, nhead, dropout=dropout)
         
         self.linear1 = Linear(d_model, dim_feedforward)
         self.dropout = Dropout(dropout)
@@ -42,8 +40,8 @@ class TransformerDecoder(nn.Module):
         attn_dists = []
         for i in range(self.num_layers):
             # self_attention
-            tgt2 = self.self_attn(tgt, tgt, tgt, attn_mask=tgt_mask,
-                                key_padding_mask=tgt_key_padding_mask)[0]
+            tgt2 = self.self_attn(tgt, tgt, tgt,  attn_mask=tgt_mask, 
+                                    key_padding_mask=tgt_key_padding_mask)[0]
             tgt = tgt + self.dropout1(tgt2)
             tgt = self.norm1(tgt)
             # Model saves attention weights from multi-head-attn
@@ -60,3 +58,5 @@ class TransformerDecoder(nn.Module):
             tgt = self.norm3(tgt)
 
         return tgt, attn_dists
+
+
